@@ -13,6 +13,10 @@ logging.basicConfig(level=logging.INFO)
 DATA_DIR = "received_data"
 os.makedirs(DATA_DIR, exist_ok=True)
 
+@app.route('/')
+def home():
+    return "Flask app is running", 200
+
 @app.route('/receive', methods=['POST'])
 def receive_data():
     try:
@@ -28,7 +32,8 @@ def receive_data():
         logging.info(f"Data received and saved to {filepath}")
         return jsonify({"message": "Data received successfully"}), 200
     except Exception as e:
-        logging.error(f"Error processing request: {e}")
+        logging.error("Error processing request:")
+        logging.error(traceback.format_exc())  # ✅ Full traceback
         return jsonify({"error": "Internal server error"}), 500
 
 if __name__ == '__main__':

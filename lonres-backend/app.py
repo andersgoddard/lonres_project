@@ -3,6 +3,7 @@ import logging
 import os
 from datetime import datetime
 import json
+import traceback
 
 app = Flask(__name__)
 
@@ -32,7 +33,8 @@ def receive_data():
         logging.info(f"Data received and saved to {filepath}")
         return jsonify({"message": "Data received successfully"}), 200
     except Exception as e:
-        logging.error(f"Error processing request: {e}")
+        logging.error("Error processing request:")
+        logging.error(traceback.format_exc())  # ✅ Full traceback
         return jsonify({"error": "Internal server error"}), 500
 
 if __name__ == '__main__':
