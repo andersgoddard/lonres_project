@@ -7,6 +7,7 @@ import json
 import traceback
 
 app = Flask(__name__)
+CORS(app, origins=["https://www.lonres.com"])
 
 DATA_DIR = "/tmp/received_data"
 os.makedirs(DATA_DIR, exist_ok=True)  # Create at app start
