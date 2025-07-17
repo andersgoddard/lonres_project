@@ -21,29 +21,39 @@ def home():
 
 @app.route('/receive', methods=['POST'])
 def receive_data():
+    import os, json
+    DATA_DIR = "/tmp/received_data"
+    os.makedirs(DATA_DIR, exist_ok=True)
+    filepath = os.path.join(DATA_DIR, "all_results.json")
+
     if not request.is_json:
         return jsonify({"error": "Request content-type must be application/json"}), 415
 
     try:
-        data = request.get_json(silent=True)
-        if not data:
-            return jsonify({"error": "Empty or invalid JSON body"}), 400
+        new_data = request.get_json(silent=True)
+        if not new_data or "results" not in new_data:
+            return jsonify({"error": "No results in JSON body"}), 400
 
-        os.makedirs(DATA_DIR, exist_ok=True)  # ✅ Ensure the directory exists
+        # Load existing results if file exists
+        if os.path.exists(filepath):
+            with open(filepath, "r") as f:
+                existing_data = json.load(f)
+        else:
+            existing_data = {"results": []}
 
-        filename = datetime.now().strftime("%Y%m%d_%H%M%S.json")
-        filepath = os.path.join(DATA_DIR, filename)
+        # Append new results
+        existing_data["results"].extend(new_data["results"])
 
-        with open(filepath, 'w') as f:
-            json.dump(data, f, indent=2)
+        # Save combined results
+        with open(filepath, "w") as f:
+            json.dump(existing_data, f, indent=2)
 
-        logging.info(f"✅ Data received and saved to {filepath}")
-        return jsonify({"message": "Data received successfully"}), 200
+        return jsonify({"message": "Results appended successfully"}), 200
 
     except Exception as e:
-        logging.error("Error processing request:")
-        logging.error(traceback.format_exc())
+        logging.error("Error appending results:", exc_info=True)
         return jsonify({"error": "Internal server error"}), 500
+
 
 @app.route('/latest', methods=['GET'])
 def get_latest_data():
