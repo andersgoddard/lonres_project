@@ -7,6 +7,8 @@ import traceback
 
 app = Flask(__name__)
 
+DATA_DIR = "/tmp/received_data"
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
@@ -24,7 +26,6 @@ def receive_data():
         if not data:
             return jsonify({"error": "Empty or invalid JSON body"}), 400
 
-        DATA_DIR = "/tmp/received_data"
         os.makedirs(DATA_DIR, exist_ok=True)  # ✅ Ensure the directory exists
 
         filename = datetime.now().strftime("%Y%m%d_%H%M%S.json")
