@@ -20,21 +20,24 @@ def home():
 
 @app.route('/receive', methods=['POST'])
 def receive_data():
+    if not request.is_json:
+        return jsonify({"error": "Request content-type must be application/json"}), 415
+
     try:
-        data = request.get_json()
+        data = request.get_json(silent=True)
         if not data:
-            return jsonify({"error": "No JSON data received"}), 400
+            return jsonify({"error": "Empty or invalid JSON body"}), 400
 
         filename = datetime.now().strftime("%Y%m%d_%H%M%S.json")
-        filepath = os.path.join(DATA_DIR, filename)
+        filepath = os.path.join("/tmp/received_data", filename)
         with open(filepath, 'w') as f:
             json.dump(data, f, indent=2)
 
         logging.info(f"Data received and saved to {filepath}")
         return jsonify({"message": "Data received successfully"}), 200
+
     except Exception as e:
-        logging.error("Error processing request:")
-        logging.error(traceback.format_exc())  # ✅ Full traceback
+        logging.error("Error processing request:", exc_info=True)
         return jsonify({"error": "Internal server error"}), 500
 
 if __name__ == '__main__':
