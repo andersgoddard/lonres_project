@@ -8,6 +8,7 @@ import traceback
 app = Flask(__name__)
 
 DATA_DIR = "/tmp/received_data"
+os.makedirs(DATA_DIR, exist_ok=True)  # Create at app start
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -45,10 +46,12 @@ def receive_data():
 @app.route('/latest', methods=['GET'])
 def get_latest_data():
     try:
+        os.makedirs(DATA_DIR, exist_ok=True)
+
         json_files = [f for f in os.listdir(DATA_DIR) if f.endswith('.json')]
         if not json_files:
             return jsonify({"message": "No data files found"}), 404
-
+        
         # Sort by newest first
         json_files.sort(reverse=True)
         latest_file = os.path.join(DATA_DIR, json_files[0])
