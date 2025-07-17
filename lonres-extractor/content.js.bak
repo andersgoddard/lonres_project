@@ -10,23 +10,10 @@
     return;
   }
 
-  let targetScriptContent = null;
-  for (let i = scripts.length - 1; i >= 0; i--) {
-    const content = scripts[i].textContent;
-    if (content.includes("dehydratedState")) {  // Adjust this to match a unique known key
-      targetScriptContent = content;
-      break;
-    }
-  }
-
-  if (!targetScriptContent) {
-    console.log("LonRes Extractor: No matching script tag found.");
-    return;
-  }
-
+  const lastScript = scripts[scripts.length - 1].textContent;
   try {
-    const jsonStart = targetScriptContent.indexOf('{');
-    const jsonText = targetScriptContent.slice(jsonStart);
+    const jsonStart = lastScript.indexOf('{');
+    const jsonText = lastScript.slice(jsonStart);
     const data = JSON.parse(jsonText);
 
     const results = data?.props?.pageProps?.dehydratedState?.queries?.[0]?.state?.data?.results;
@@ -40,16 +27,16 @@
         },
         body: JSON.stringify({ results: results })
       })
-        .then(response => {
-          if (response.ok) {
-            console.log("LonRes Extractor: Results successfully sent to Render API.");
-          } else {
-            console.error("LonRes Extractor: Failed to send results. Status:", response.status);
-          }
-        })
-        .catch(error => {
-          console.error("LonRes Extractor: Error sending results to Render API:", error);
-        });
+      .then(response => {
+        if (response.ok) {
+          console.log("LonRes Extractor: Results successfully sent to Render API.");
+        } else {
+          console.error("LonRes Extractor: Failed to send results. Status:", response.status);
+        }
+      })
+      .catch(error => {
+        console.error("LonRes Extractor: Error sending results to Render API:", error);
+      });
 
     } else {
       console.log("LonRes Extractor: Results not found in JSON structure.");

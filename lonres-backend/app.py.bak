@@ -13,10 +13,6 @@ logging.basicConfig(level=logging.INFO)
 DATA_DIR = "received_data"
 os.makedirs(DATA_DIR, exist_ok=True)
 
-@app.route('/')
-def home():
-    return "Flask app is running", 200
-
 @app.route('/receive', methods=['POST'])
 def receive_data():
     try:
