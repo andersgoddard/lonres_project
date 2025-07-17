@@ -41,6 +41,29 @@ def receive_data():
         logging.error(traceback.format_exc())
         return jsonify({"error": "Internal server error"}), 500
 
+@app.route('/latest', methods=['GET'])
+def get_latest_data():
+    try:
+        json_files = [f for f in os.listdir(DATA_DIR) if f.endswith('.json')]
+        if not json_files:
+            return jsonify({"message": "No data files found"}), 404
+
+        # Sort by newest first
+        json_files.sort(reverse=True)
+        latest_file = os.path.join(DATA_DIR, json_files[0])
+
+        with open(latest_file, 'r') as f:
+            contents = json.load(f)
+
+        return jsonify({
+            "filename": json_files[0],
+            "data": contents
+        })
+
+    except Exception as e:
+        logging.error("Error reading latest file:", exc_info=True)
+        return jsonify({"error": "Failed to read latest data file"}), 500
+
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
