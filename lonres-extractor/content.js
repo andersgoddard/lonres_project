@@ -20,7 +20,7 @@
     if (results) {
       console.log("LonRes Extractor: Sending results to Render API...");
 
-      fetch("https://your-render-api-endpoint.com/receive", {
+      fetch("https://lonres-activity-monitor.onrender.com/receive", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
