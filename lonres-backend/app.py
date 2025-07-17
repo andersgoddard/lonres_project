@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, CORS
 import logging
 import os
 from datetime import datetime
